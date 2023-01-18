@@ -59,3 +59,35 @@ gapminder_data%>%
   pivot_wider(names_from = year, values_from = lifeExp)%>%
   view()
 
+# Working with messy data
+
+co2_emissions_dirty <- read_csv("data/co2-un-data.csv", skip=2,
+         col_names=c("region", "country", "year", "series", "value", "footnotes", "source"))
+
+co2_emissions <- co2_emissions_dirty%>%
+  select(country, year, series, value)%>%
+  mutate(series = recode(series, 
+                         "Emissions (thousand metric tons of carbon dioxide)" = "total emissions", 
+                         "Emissions per capita (metric tons of carbon dioxide" = "per_capita_emissions"))%>%
+  pivot_wider(names_from = series, values_from = value)%>%
+#filter for year 2005
+#select to remove the year column
+#store as an object with a descriptive name (added co2_emissions_2005 above with an arrow)
+  filter(year == 2005) %>%
+  select(-year)
+co2_emissions_2005
+
+# Bringing in 2007 population data
+gapminder_data_2007 <- read_csv("data/gapminder_data.csv")%>%
+  filter(year == 2007)%>%
+  select(country, pop, lifeExp, gdpPercap)
+
+inner_join(co2_emissions, gapminder_data_2007, by = "country") 
+#adding by = country is not necessary here, but explicitly tells R to join by country
+
+anti_join(gapminder_data_2007, co2_emissions, by = "country")
+#tells us what countries the two tables do NOT have in common; only one of the tables has each of the countries listed; order matters here as it reads the missing countries based on what's in the first table
+
+full_join(co2_emissions, gapminder_data_2007)%>%
+  view()
+
