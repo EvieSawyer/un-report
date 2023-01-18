@@ -82,12 +82,13 @@ gapminder_data_2007 <- read_csv("data/gapminder_data.csv")%>%
   filter(year == 2007)%>%
   select(country, pop, lifeExp, gdpPercap)
 
-inner_join(co2_emissions, gapminder_data_2007, by = "country") 
+joined_co2_pop <- inner_join(co2_emissions, gapminder_data_2007, by = "country") 
 #adding by = country is not necessary here, but explicitly tells R to join by country
 
 anti_join(gapminder_data_2007, co2_emissions, by = "country")
 #tells us what countries the two tables do NOT have in common; only one of the tables has each of the countries listed; order matters here as it reads the missing countries based on what's in the first table
 
-full_join(co2_emissions, gapminder_data_2007)%>%
-  view()
+full_join(co2_emissions, gapminder_data_2007)
 
+# Writing a csv
+write_csv(joined_co2_pop, file = "data/joined_co2_pop.csv")
